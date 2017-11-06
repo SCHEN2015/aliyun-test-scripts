@@ -53,20 +53,11 @@ function create_instance()
 		exit 1
 	fi
 
-	# check instance status
-	#x=$(aliyuncli ecs DescribeInstances --InstanceId $instance_id)		# https://github.com/aliyun/aliyun-cli/issues/38
-	x=$(aliyuncli ecs DescribeInstances --InstanceName $instance_name)
-	if [ $? -eq 0 ]; then
-		instance_status=$(echo $x | jq -r .Instances.Instance[].Status)
-		echo "Current status = $instance_status"
-		sleep 20s
-		echo "Waiting for 20s..."
-	else
-		echo "aliyuncli ecs DescribeInstances failed."
-		exit 1
-	fi
+	# wait the instance
+	echo "Waiting for 20s..."
+	sleep 20s
 
-	# assign public ip and start instance
+	# assign public ip
 	x=$(aliyuncli ecs AllocatePublicIpAddress --InstanceId $instance_id)
 	if [ $? -eq 0 ]; then
 		echo "PublicIpAddress Allocated."
@@ -75,6 +66,7 @@ function create_instance()
 		exit 1
 	fi
 
+	# start instance
 	x=$(aliyuncli ecs StartInstance --InstanceId $instance_id)
 	if [ $? -eq 0 ]; then
 		echo "Instance Started."
@@ -90,19 +82,18 @@ function create_cluster()
 	#timestamp=$(date -u +%Y%m%d%H%M%S)
 
 	# test machine
-	#create_instance ecs.sn1ne.xlarge cheshi-netpt-test-machine cheshi-netpt-test
-	#show_instance_info cheshi-netpt-test-machine
+	create_instance ecs.sn1ne.xlarge cheshi-netpt-test-machine cheshi-netpt-test
 	create_instance ecs.sn1ne.large cheshi-netpt-train-machine-1 cheshi-netpt-train-1
-	show_instance_info cheshi-netpt-train-machine-1
 	create_instance ecs.sn1ne.large cheshi-netpt-train-machine-2 cheshi-netpt-train-2
-	show_instance_info cheshi-netpt-train-machine-2
 }
 
 
 create_cluster
-#show_instance_info cheshi-netpt-test-machine
+show_instance_info cheshi-netpt-test-machine
+show_instance_info cheshi-netpt-train-machine-1
+show_instance_info cheshi-netpt-train-machine-2
 
-
-#aliyuncli ecs AllocatePublicIpAddress --InstanceId i-rj92hqbtt8ujl1pkjc6d
-#aliyuncli ecs StartInstance --InstanceId i-rj92hqbtt8ujl1pkjc6
 #aliyuncli ecs DeleteInstance --InstanceId i-rj9e1iuty6vkfdkpz4nk --Force
+
+exit 0
+
