@@ -88,10 +88,35 @@ function create_cluster()
 }
 
 
-create_cluster
+function delete_instance()
+{
+	[ -z "$1" ] && exit 1 || instance_id=$1
+
+	x=$(aliyuncli ecs StopInstance --InstanceId $instance_id)
+	if [ $? -eq 0 ]; then
+		echo "Instance Stopped."
+	else
+		echo "aliyuncli ecs StopInstance failed."
+		exit 1
+	fi
+
+	sleep 10s
+
+	x=$(aliyuncli ecs DeleteInstance --InstanceId $instance_id --Force)
+	if [ $? -eq 0 ]; then
+		echo "Instance Deleted."
+	else
+		echo "aliyuncli ecs DeleteInstance failed."
+		exit 1
+	fi
+}
+
+#create_cluster
 show_instance_info cheshi-netpt-test-machine
 show_instance_info cheshi-netpt-train-machine-1
 show_instance_info cheshi-netpt-train-machine-2
+
+#delete_instance 
 
 #aliyuncli ecs DeleteInstance --InstanceId i-rj9e1iuty6vkfdkpz4nk --Force
 
