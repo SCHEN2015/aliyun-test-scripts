@@ -1,128 +1,173 @@
 #!/bin/bash
 
-pem=cheshi_aliyun.pem
-training_host_list="172.20.213.194 172.20.213.192"
-
-# Tx
-
-n=0
-for host in $training_host_list; do
-	let n=n+1
-	let port=10080+n
-	echo "Start netserver at port $port on host $host"
-	ssh -i $pem root@$host "netserver -p $port"
-done
+# This script run on test host.
 
 
-msize=1400
+function start_server_on_peers()
+{
+	n=0
+	for host in $peer_host_list; do
+		let n=n+1
+		let port=10080+n
+		echo "Start netserver on peer $host, listen at $port."
+		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "netserver -p $port"
+	done
+}
 
-n=0
-for host in $training_host_list; do
-	let n=n+1
-	let port=10080+n
-	tmplog=netperf.tmplog.$n
-	echo "Start netperf test at port $port to host $host"
-	netperf -H $host -p $port -t UDP_STREAM -l 10 -f m -- -m $msize &> $tmplog &
-done
+function stop_server_on_peers()
+{
+	n=0
+	for host in $peer_host_list; do
+		echo "Stop netserver on peer $host."
+		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9"
+	done
+}
 
-wait
+function load_test_to_peers()
+{
+	# Inputs : $1 = message size;
+	# Outputs: $debuglog; $sdatalog; $bw : bandwidth in Mb/s; $pps : package# per second
+	msize=${1:-1400}
+	duration=10
 
-cat netperf.tmplog.* > netperf.log.1 && rm -f netperf.tmplog.*
+	# trigger load test
+	n=0
+	for host in $peer_host_list; do
+		let n=n+1
+		let port=10080+n
+		tmplog=netperf.tmplog.$n
+		echo "Start netperf test at port $port to host $host"
+		netperf -H $host -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> $tmplog &
+	done
 
-BWtx=$(grep -w "$msize" netperf.log.1 | awk '{SUM += $6};END {print SUM}')
+	wait
 
+	# get results
+	debuglog=~/debuginfo.log
+	sdatalog=~/sourcedata.log
 
-msize=1
+	for tmplog in $(ls netperf.tmplog.*); do
+		sed -n '4p' $tmplog >> $sdatalog
+		cat $tmplog >> $debuglog
+		rm -f $tmplog
+	done
 
-n=0
-for host in $training_host_list; do
-        let n=n+1
-	let port=10080+n
-        tmplog=netperf.tmplog.$n
-        echo "Start netperf test at port $port on host $host"
-        netperf -H $host -p $port -t UDP_STREAM -l 10 -f m -- -m $msize &> $tmplog &
-done
+	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
+	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM}')
+}
 
-wait
+function start_server_on_local()
+{
+	n=0
+	for host in $peer_host_list; do
+		let n=n+1
+		let port=10080+n
+		echo "Start netserver on localhost, listen at $port."
+		netserver -p $port
+	done
+}
 
-cat netperf.tmplog.* > netperf.log.2 && rm -f netperf.tmplog.*
+function stop_server_on_local()
+{
+	echo "Stop netserver on localhost."
+	pidof netserver | xargs kill -9
+}
 
-PPS=$(grep -w "$msize" netperf.log.2 | awk '{SUM += $4 / $3};END {print SUM}')
+function load_test_from_peers()
+{
+	# Inputs : $1 = message size;
+	# Outputs: $debuglog; $sdatalog; $bw : bandwidth in Mb/s; $pps : package# per second
+	msize=${1:-1400}
+	duration=10
+	localip=$(ifconfig eth0 | grep inet | awk '{print $2}')
 
-cat netperf.log.1
-echo "====="
-echo $BWtx
+	# trigger load test
+	n=0
+	for host in $peer_host_list; do
+		let n=n+1
+		let port=10080+n
+		echo "Start netperf test at port $port from host $host"
+		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log" &
+	done
 
-cat netperf.log.2
-echo "====="
-echo $PPS
+	wait
 
+	# get remote logs
+	for host in $peer_host_list; do
+		let n=n+1
+		tmplog=netperf.tmplog.$n
+		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log; rm -f ~/temp.log" &> $tmplog
+	done
 
-# Rx
+	# get results
+	debuglog=~/debuginfo.log
+	sdatalog=~/sourcedata.log
 
-n=0
-for host in $training_host_list; do
-	let n=n+1
-	let port=10080+n
-	echo "Start netserver at port $port on localhost"
-	netserver -p $port
-done
+	for tmplog in $(ls netperf.tmplog.*); do
+		sed -n '4p' $tmplog >> $sdatalog
+		cat $tmplog >> $debuglog
+		rm -f $tmplog
+	done
 
-
-msize=1400
-
-localip=$(ifconfig eth0 | grep inet | awk '{print $2}')
-
-n=0
-for host in $training_host_list; do
-	let n=n+1
-	let port=10080+n
-	echo "Start netperf test at port $port from host $host"
-	ssh -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l 10 -f m -- -m $msize &> ~/netperf.tmplog" &
-done
-
-wait
-
-for host in $training_host_list; do
-	let n=n+1
-        tmplog=netperf.tmplog.$n
-	ssh -i $pem root@$host "cat ~/netperf.tmplog; rm -f ~/netperf.tmplog" &> $tmplog
-done
-
-cat netperf.tmplog.* > netperf.log.3 && rm -f netperf.tmplog.*
-
-BWrx=$(grep -w "$msize" netperf.log.3 | awk '{SUM += $6};END {print SUM}')
-
-
-msize=1
-
-n=0
-for host in $training_host_list; do
-	let n=n+1
-	let port=10080+n
-	echo "Start netperf test at port $port from host $host"
-	ssh -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l 10 -f m -- -m $msize &> ~/netperf.tmplog" &
-done
-
-wait
-
-n=0
-for host in $training_host_list; do
-	let n=n+1
-        tmplog=netperf.tmplog.$n
-	ssh -i $pem root@$host "cat ~/netperf.tmplog; rm -f ~/netperf.tmplog" &> $tmplog
-done
-
-cat netperf.tmplog.* > netperf.log.4 && rm -f netperf.tmplog.*
-
-PPS=$(grep -w "$msize" netperf.log.4 | awk '{SUM += $4 / $3};END {print SUM}')
-
-cat netperf.log.3
-echo "====="
-echo $BWrx
-
-cat netperf.log.4
-echo "====="
-echo $PPS
+	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
+	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM}')
+}
 
 
+# main
+pem=~/cheshi_aliyun.pem
+peer_host_list="172.20.213.194 172.20.213.192"
+logfile=./netperf.full.log
+vmsize="Unknown"
+
+
+# Send test
+start_server_on_peers
+
+load_test_to_peers 1400
+echo -e "Send test:\n" >> $logfile
+cat $debuglog >> $logfile
+echo -e "Source data:\n" >> $logfile
+cat $sdatalog >> $logfile
+rm -f $debuglog $sdatalog
+BWtx=$bw
+
+load_test_to_peers 1
+echo -e "Send test:\n" >> $logfile
+cat $debuglog >> $logfile
+echo -e "Source data:\n" >> $logfile
+cat $sdatalog >> $logfile
+rm -f $debuglog $sdatalog
+PPStx=$pps
+
+stop_server_on_peers
+
+echo -e "\n==========\n" >> $logfile
+
+# Receive test
+start_server_on_local
+
+load_test_from_peers 1400
+echo -e "Receive test:\n" >> $logfile
+cat $debuglog >> $logfile
+echo -e "Source data:\n" >> $logfile
+cat $sdatalog >> $logfile
+rm -f $debuglog $sdatalog
+BWrx=$bw
+
+load_test_from_peers 1400
+echo -e "Receive test:\n" >> $logfile
+cat $debuglog >> $logfile
+echo -e "Source data:\n" >> $logfile
+cat $sdatalog >> $logfile
+rm -f $debuglog $sdatalog
+PPSrx=$pps
+
+stop_server_on_local
+
+# Write down summary
+echo -e "\nTest Summary: \n----------\n" >> $logfile
+printf "** %-12s %-12s %-12s %-10s %-10s\n" VMSize "BWtx(Kb/s)" PPStx "BWrx(Kb/s)" PPSrx >> $logfile
+printf "** %-12s %-12s %-12s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
+
+exit 0
