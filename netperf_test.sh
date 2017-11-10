@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This script run on test host.
+# Inputs: an ip list of peer hosts
 
 
 function start_server_on_peers()
@@ -116,7 +117,7 @@ function load_test_from_peers()
 
 # main
 pem=~/cheshi_aliyun.pem
-peer_host_list="172.20.213.194 172.20.213.192"
+peer_host_list=${@:-"172.20.213.194 172.20.213.192"}
 logfile=./netperf.full.log
 vmsize="Unknown"
 
