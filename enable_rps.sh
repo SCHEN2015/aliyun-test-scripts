@@ -17,7 +17,7 @@ do
 	cpuset="${cpuset}f"
 done
 
-for rps_file in $(ls /sys/class/net/eth*/queues/rx-*/rps_cpus)
+for rps_file in $(ls /sys/class/net/eth0/queues/rx-*/rps_cpus)
 do
 	echo $cpuset > $rps_file
 done
