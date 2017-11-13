@@ -8,15 +8,15 @@ function upload()
 {
 	host=$1
 	echo "Upload scripts to host $host"
-	scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem install_netperf.sh enable_rps.sh check_environment.sh root@$host:~ &
+	scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem install_netperf.sh enable_rps.sh check_environment.sh root@$host:~ &>/dev/null &
 }
 
 function setup()
 {
 	host=$1
 	echo "Setup environment on host $host"
-	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "~/install_netperf.sh" &
-	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "~/enable_rps.sh" &
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "~/install_netperf.sh &>/dev/null" &
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "~/enable_rps.sh &>/dev/null" &
 }
 
 function check()
