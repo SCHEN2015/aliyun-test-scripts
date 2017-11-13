@@ -156,7 +156,7 @@ cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 BWrx=$bw
 
-load_test_from_peers 1400
+load_test_from_peers 1
 echo -e "Receive test:\n" >> $logfile
 cat $debuglog >> $logfile
 echo -e "Source data:\n" >> $logfile
@@ -170,5 +170,7 @@ stop_server_on_local
 echo -e "\nTest Summary: \n----------\n" >> $logfile
 printf "** %-12s %-12s %-12s %-10s %-10s\n" VMSize "BWtx(Kb/s)" PPStx "BWrx(Kb/s)" PPSrx >> $logfile
 printf "** %-12s %-12s %-12s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
+
+tail -n 4 $logfile
 
 exit 0
