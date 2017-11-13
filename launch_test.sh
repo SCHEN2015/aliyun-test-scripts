@@ -49,6 +49,7 @@ function create_instance()
 		instance_id=$(echo $x | jq -r .InstanceId)
 		echo "Instance created, resource id = $instance_id)"
 	else
+		echo "$x"
 		echo "aliyuncli ecs CreateInstance failed."
 		exit 1
 	fi
@@ -62,6 +63,7 @@ function create_instance()
 	if [ $? -eq 0 ]; then
 		echo "PublicIpAddress Allocated."
 	else
+		echo "$x"
 		echo "aliyuncli ecs AllocatePublicIpAddress failed."
 		exit 1
 	fi
@@ -71,6 +73,7 @@ function create_instance()
 	if [ $? -eq 0 ]; then
 		echo "Instance Started."
 	else
+		echo "$x"
 		echo "aliyuncli ecs StartInstance failed."
 		exit 1
 	fi
@@ -96,6 +99,7 @@ function delete_instance()
 	if [ $? -eq 0 ]; then
 		echo "Instance Stopped."
 	else
+		echo "$x"
 		echo "aliyuncli ecs StopInstance failed."
 		exit 1
 	fi
@@ -106,6 +110,7 @@ function delete_instance()
 	if [ $? -eq 0 ]; then
 		echo "Instance Deleted."
 	else
+		echo "$x"
 		echo "aliyuncli ecs DeleteInstance failed."
 		exit 1
 	fi
