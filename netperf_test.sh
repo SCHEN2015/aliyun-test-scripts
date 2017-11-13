@@ -48,7 +48,7 @@ function load_test_to_peers()
 	sdatalog=~/sourcedata.log
 
 	for tmplog in $(ls netperf.tmplog.*); do
-		sed -n '4p' $tmplog >> $sdatalog
+		sed -n '6p' $tmplog >> $sdatalog
 		cat $tmplog >> $debuglog
 		rm -f $tmplog
 	done
@@ -105,7 +105,7 @@ function load_test_from_peers()
 	sdatalog=~/sourcedata.log
 
 	for tmplog in $(ls netperf.tmplog.*); do
-		sed -n '4p' $tmplog >> $sdatalog
+		sed -n '7p' $tmplog >> $sdatalog
 		cat $tmplog >> $debuglog
 		rm -f $tmplog
 	done
