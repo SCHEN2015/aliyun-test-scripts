@@ -51,7 +51,7 @@ function create_instance()
 	else
 		echo "$x"
 		echo "aliyuncli ecs CreateInstance failed."
-		exit 1
+		return 1
 	fi
 
 	# wait the instance
@@ -65,7 +65,7 @@ function create_instance()
 	else
 		echo "$x"
 		echo "aliyuncli ecs AllocatePublicIpAddress failed."
-		exit 1
+		return 1
 	fi
 
 	# start instance
@@ -75,7 +75,7 @@ function create_instance()
 	else
 		echo "$x"
 		echo "aliyuncli ecs StartInstance failed."
-		exit 1
+		return 1
 	fi
 }
 
@@ -91,9 +91,26 @@ function create_cluster()
 }
 
 
+function create_test_machines()
+{
+	instance_type=${1:-"ecs.sn2ne.14xlarge"}
+	create_instance $instance_type cheshi-netpt-test-machine $instance_type
+}
+
+
+function create_train_machines()
+{
+	instance_type=${1:-"ecs.sn2ne.2xlarge"}
+
+	for i in $(seq 8); do
+		create_instance $instance_type cheshi-netpt-train-machine-$i cheshi-netpt-peer-$i
+	done
+}
+
+
 function delete_instance()
 {
-	[ -z "$1" ] && exit 1 || instance_id=$1
+	[ -z "$1" ] && return 1 || instance_id=$1
 
 	x=$(aliyuncli ecs StopInstance --InstanceId $instance_id)
 	if [ $? -eq 0 ]; then
@@ -101,7 +118,7 @@ function delete_instance()
 	else
 		echo "$x"
 		echo "aliyuncli ecs StopInstance failed."
-		exit 1
+		return 1
 	fi
 
 	sleep 10s
@@ -112,18 +129,31 @@ function delete_instance()
 	else
 		echo "$x"
 		echo "aliyuncli ecs DeleteInstance failed."
-		exit 1
+		return 1
 	fi
 }
 
+
+function list_private_ips()
+{
+	private_ips=""
+	for i in $(seq 8); do
+		show_instance_info cheshi-netpt-train-machine-$i	# &>/dev/null
+		[ -z "$private_ips" ] && private_ips=$private_ip || private_ips="$private_ips $private_ip"
+	done
+
+	echo -e "List of private_ips for train machine:\n\"$private_ips\""
+}
+
 #create_cluster
-show_instance_info cheshi-netpt-test-machine
-show_instance_info cheshi-netpt-train-machine-1
-show_instance_info cheshi-netpt-train-machine-2
+#create_train_machines
+#create_test_machines ecs.sn2ne.14xlarge
 
-#delete_instance 
+#show_instance_info cheshi-netpt-test-machine
+#show_instance_info cheshi-netpt-train-machine-1
+#show_instance_info cheshi-netpt-train-machine-2
 
-#aliyuncli ecs DeleteInstance --InstanceId i-rj9e1iuty6vkfdkpz4nk --Force
+list_private_ips
 
 exit 0
 
