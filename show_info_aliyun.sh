@@ -31,4 +31,9 @@ show "" lsblk -p
 show "" ip addr
 show "Metadata" ./metadata.sh
 
+# Additional
+
+show "" ethtool -l eth0
+show "" grep ^ /sys/class/net/eth0/queues/rx-*/rps_cpus
+
 exit 0
