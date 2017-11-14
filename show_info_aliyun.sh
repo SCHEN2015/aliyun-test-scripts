@@ -21,12 +21,7 @@ function show(){
 
 
 show "Time" date
-
-if [ "$(os_type.sh)" = "redhat" ]; then
-	show "Release" cat /etc/system-release
-else
-	show "Release" cat /etc/issue
-fi
+show "Release" cat /etc/system-release
 
 show "" uname -a
 show "" cat /proc/cmdline
