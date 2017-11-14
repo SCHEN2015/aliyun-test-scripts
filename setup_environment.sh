@@ -29,7 +29,8 @@ function check()
 
 # main
 pem=~/cheshi_aliyun.pem
-peer_host_list=${@:-"172.20.213.194 172.20.213.192"}
+[ -z "$@" ] && echo "Usage: $0 127.0.0.1 <Peer's IP list>" && exit 1
+peer_host_list=$@
 logfile=./netperf.full.log
 vmsize="Unknown"
 

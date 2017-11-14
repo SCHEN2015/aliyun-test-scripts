@@ -117,7 +117,8 @@ function load_test_from_peers()
 
 # main
 pem=~/cheshi_aliyun.pem
-peer_host_list=${@:-"172.20.213.194 172.20.213.192"}
+[ -z "$1" ] && echo "Usage: $0 <Peer's IP list>" && exit 1
+peer_host_list=$1
 vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned the instance_type into hostname.
 logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
 
