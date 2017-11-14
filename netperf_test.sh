@@ -54,7 +54,7 @@ function load_test_to_peers()
 	done
 
 	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
-	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM}')
+	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
 }
 
 function start_server_on_local()
@@ -111,7 +111,7 @@ function load_test_from_peers()
 	done
 
 	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
-	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM}')
+	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
 }
 
 
@@ -123,7 +123,7 @@ vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned t
 logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
 
 # basic information
-show_info_aliyun.sh >> $logfile
+./show_info_aliyun.sh >> $logfile
 echo -e "\n\n" >> $logfile
 
 # Send test
@@ -172,8 +172,8 @@ stop_server_on_local
 
 # Write down summary
 echo -e "\nTest Summary: \n----------\n" >> $logfile
-printf "** %-12s %-12s %-12s %-10s %-10s\n" VMSize "BWtx(Kb/s)" PPStx "BWrx(Kb/s)" PPSrx >> $logfile
-printf "** %-12s %-12s %-12s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
+printf "** %-20s %-12s %-12s %-10s %-10s\n" VMSize "BWtx(mb/s)" PPStx "BWrx(mb/s)" PPSrx >> $logfile
+printf "** %-20s %-12s %-12s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
 
 tail -n 4 $logfile
 
