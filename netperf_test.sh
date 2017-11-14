@@ -11,7 +11,7 @@ function start_server_on_peers()
 		let n=n+1
 		let port=10080+n
 		echo "Start netserver on peer $host, listen at $port."
-		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "netserver -p $port"
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netserver -p $port"
 	done
 }
 
@@ -20,7 +20,7 @@ function stop_server_on_peers()
 	n=0
 	for host in $peer_host_list; do
 		echo "Stop netserver on peer $host."
-		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9"
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9"
 	done
 }
 
@@ -88,7 +88,7 @@ function load_test_from_peers()
 		let n=n+1
 		let port=10080+n
 		echo "Start netperf test at port $port from host $host"
-		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log" &
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log" &
 	done
 
 	wait
@@ -97,7 +97,7 @@ function load_test_from_peers()
 	for host in $peer_host_list; do
 		let n=n+1
 		tmplog=netperf.tmplog.$n
-		ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log; rm -f ~/temp.log" &> $tmplog
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log; rm -f ~/temp.log" &> $tmplog
 	done
 
 	# get results
