@@ -119,7 +119,7 @@ function load_test_from_peers()
 pem=~/cheshi_aliyun.pem
 peer_host_list=${@:-"172.20.213.194 172.20.213.192"}
 logfile=./netperf.full.log
-vmsize="Unknown"
+vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned the instance_type into hostname.
 
 
 # Send test
