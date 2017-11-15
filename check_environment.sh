@@ -2,23 +2,29 @@
 
 # This script run on test and peer host.
 
-# main
-pem=~/cheshi_aliyun.pem
-peer_host_list=${@:-"172.20.213.194 172.20.213.192"}
-logfile=./netperf.full.log
-vmsize="Unknown"
-
 # check netperf
 type netperf &>/dev/null
-[ $? -ne 0 ] && echo "Failed to check netperf." && exit 1
+if [ $? -eq 0 ]; then
+    $res1="PASS"
+else
+    $res1="FAIL"
+fi
 
 # check multiple queue
-[ "$(ethtool -l eth0 | grep "^Combined:" | sort -u | wc -l)" != "1" ] && echo "Failed to check NIC queue." && exit 1
+if [ "$(ethtool -l eth0 | grep "^Combined:" | sort -u | wc -l)" = "1" ]; then
+    $res2="PASS"
+else
+    $res2="FAIL"
+fi
 
 # check rps
-[ "$(grep 0 /sys/class/net/eth0/queues/rx-*/rps_cpus | wc -l)" != 0 ] && echo "Failed to check RPS." && exit 1
+if [ "$(grep f /sys/class/net/eth0/queues/rx-*/rps_cpus | wc -l)" != "0" ]; then
+    $res3="PASS"
+else
+    $res3="FAIL"
+fi
 
-# passed
-echo "All check passed."
+# Show summary
+echo "Netperf:$res1 NIC_Queue:$res2 RPS:$res3"
 
 exit 0
