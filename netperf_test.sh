@@ -53,7 +53,7 @@ function load_test_to_peers()
 		rm -f $tmplog
 	done
 
-	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
+	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM / 1000}')
 	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
 }
 
@@ -110,7 +110,7 @@ function load_test_from_peers()
 		rm -f $tmplog
 	done
 
-	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM}')
+	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM / 1000}')
 	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
 }
 
@@ -127,31 +127,37 @@ logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
 echo -e "\n\n" >> $logfile
 
 # Send test
+echo -e "\nStart netserver..."
 start_server_on_peers
 
+echo -e "\nStart netperf test..."
 load_test_to_peers 1400
-echo -e "Send test:\n" >> $logfile
+echo -e "\nSend test:\n" >> $logfile
 cat $debuglog >> $logfile
-echo -e "Source data:\n" >> $logfile
+echo -e "\nSource data:\n" >> $logfile
 cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 BWtx=$bw
 
+echo -e "\nStart netperf test..."
 load_test_to_peers 1
-echo -e "Send test:\n" >> $logfile
+echo -e "\nSend test:\n" >> $logfile
 cat $debuglog >> $logfile
-echo -e "Source data:\n" >> $logfile
+echo -e "\nSource data:\n" >> $logfile
 cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 PPStx=$pps
 
+echo -e "\nStop netserver..."
 stop_server_on_peers
 
 echo -e "\n==========\n" >> $logfile
 
 # Receive test
+echo -e "\nStart netserver..."
 start_server_on_local
 
+echo -e "\nStart netperf test..."
 load_test_from_peers 1400
 echo -e "Receive test:\n" >> $logfile
 cat $debuglog >> $logfile
@@ -160,6 +166,7 @@ cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 BWrx=$bw
 
+echo -e "\nStart netperf test..."
 load_test_from_peers 1
 echo -e "Receive test:\n" >> $logfile
 cat $debuglog >> $logfile
@@ -168,12 +175,13 @@ cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 PPSrx=$pps
 
+echo -e "\nStop netserver..."
 stop_server_on_local
 
 # Write down summary
 echo -e "\nTest Summary: \n----------\n" >> $logfile
-printf "** %-20s %-12s %-12s %-10s %-10s\n" VMSize "BWtx(mb/s)" PPStx "BWrx(mb/s)" PPSrx >> $logfile
-printf "** %-20s %-12s %-12s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
+printf "** %-20s %-10s %-10s %-10s %-10s\n" VMSize "BWtx(Gb/s)" PPStx "BWrx(Gb/s)" PPSrx >> $logfile
+printf "** %-20s %-10s %-10s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
 
 tail -n 4 $logfile
 
