@@ -85,9 +85,9 @@ function create_cluster()
 	#timestamp=$(date -u +%Y%m%d%H%M%S)
 
 	# test machine
-	create_instance ecs.sn1ne.xlarge cheshi-netpt-test-machine cheshi-netpt-test
-	create_instance ecs.sn1ne.large cheshi-netpt-train-machine-1 cheshi-netpt-train-1
-	create_instance ecs.sn1ne.large cheshi-netpt-train-machine-2 cheshi-netpt-train-2
+	create_instance ecs.sn2ne.2xlarge cheshi-netpt-test-machine ecs.sn2ne.2xlarge
+	create_instance ecs.sn2ne.xlarge cheshi-netpt-train-machine-1 cheshi-netpt-peer-1
+	create_instance ecs.sn2ne.xlarge cheshi-netpt-train-machine-2 cheshi-netpt-peer-2
 }
 
 
@@ -146,6 +146,7 @@ function list_private_ips()
 	private_ips=""
 	for i in $(seq 8); do
 		show_instance_info cheshi-netpt-train-machine-$i	# &>/dev/null
+		[ -z "$private_ip" ] && continue
 		[ -z "$private_ips" ] && private_ips=$private_ip || private_ips="$private_ips $private_ip"
 	done
 
@@ -153,10 +154,10 @@ function list_private_ips()
 }
 
 #create_cluster
-#create_train_machines
+#create_train_machines ecs.sn2ne.xlarge
 #create_test_machines ecs.sn2ne.14xlarge
 
-#show_instance_info cheshi-netpt-test-machine
+show_instance_info cheshi-netpt-test-machine
 #show_instance_info cheshi-netpt-train-machine-1
 #show_instance_info cheshi-netpt-train-machine-2
 
