@@ -34,6 +34,7 @@ show "Metadata" ./metadata.sh
 # Additional
 
 show "" ethtool -l eth0
-show "" grep ^ /sys/class/net/eth0/queues/rx-*/rps_cpus
+show "" systemctl status irqbalance
+show "" tail /sys/class/net/eth0/queues/rx-*/{rps_cpus,rps_flow_cnt}
 
 exit 0
