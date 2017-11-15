@@ -19,6 +19,14 @@ function setup()
 	ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "~/enable_rps.sh &>/dev/null" &
 }
 
+function reboot()
+{
+	host=$1
+	[ "$host" = "127.0.0.1" ] && echo "Skip rebooting 127.0.0.1" && return 0
+	echo "Reboot host $host"
+	ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "reboot &" &
+}
+
 function check()
 {
 	host=$1
@@ -29,7 +37,7 @@ function check()
 
 # main
 pem=~/cheshi_aliyun.pem
-[ -z "$@" ] && echo "Usage: $0 127.0.0.1 <Peer's IP list>" && exit 1
+[ -z "$1" ] && echo "Usage: $0 127.0.0.1 <Peer's IP list>" && exit 1
 peer_host_list=$@
 logfile=./netperf.full.log
 vmsize="Unknown"
@@ -37,10 +45,22 @@ vmsize="Unknown"
 
 for host in $peer_host_list; do
 	upload $host
-	wait
+done
+wait
+
+for host in $peer_host_list; do
 	setup $host
-	wait
+done
+wait
+
+for host in $peer_host_list; do
+	reboot $host
+done
+sleep 1m
+
+for host in $peer_host_list; do
 	check $host
 done
+wait
 
 exit 0
