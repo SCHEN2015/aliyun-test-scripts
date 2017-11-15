@@ -110,7 +110,14 @@ function create_train_machines()
 
 function delete_instance()
 {
-	[ -z "$1" ] && return 1 || instance_id=$1
+	[ -z "$1" ] && return 1
+
+	if [[ "$1" = i* ]]; then
+		instance_id=$1
+	else
+		instance_name=$1
+		instance_id=$(aliyuncli ecs DescribeInstances --InstanceName $instance_name | jq -r .Instances.Instance[].InstanceId)
+	fi
 
 	x=$(aliyuncli ecs StopInstance --InstanceId $instance_id)
 	if [ $? -eq 0 ]; then
