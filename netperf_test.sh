@@ -47,12 +47,13 @@ function load_test_to_peers()
 	debuglog=~/debuginfo.log
 	sdatalog=~/sourcedata.log
 
-	for tmplog in $(ls netperf.tmplog.*); do
-		sed -n '6p' $tmplog >> $sdatalog
+	for tmplog in $(ls ./netperf.tmplog.*); do
+		sed -n '6p' $tmplog >> $sdatalog	# Get the 1st line of UDP_STREAM report (local:test-machine)
 		cat $tmplog >> $debuglog
 		rm -f $tmplog
 	done
 
+	# Calculated from the 1st line of UDP_STREAM report (local:test-machine)
 	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM / 1000}')
 	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
 }
@@ -104,14 +105,14 @@ function load_test_from_peers()
 	debuglog=~/debuginfo.log
 	sdatalog=~/sourcedata.log
 
-	for tmplog in $(ls netperf.tmplog.*); do
-		sed -n '7p' $tmplog >> $sdatalog
+		sed -n '7p' $tmplog >> $sdatalog	# Get the 2nd line of UDP_STREAM report (remote:test-machine)
 		cat $tmplog >> $debuglog
 		rm -f $tmplog
 	done
 
-	bw=$(cat $sdatalog | awk '{SUM += $6};END {print SUM / 1000}')
-	pps=$(cat $sdatalog | awk '{SUM += $4 / $3};END {print SUM / 10000}')
+	# Calculated from the 2nd line of UDP_STREAM report (remote:test-machine)
+	bw=$(cat $sdatalog | awk '{SUM += $4};END {print SUM / 1000}')
+	pps=$(cat $sdatalog | awk '{SUM += $3 / $2};END {print SUM / 10000}')
 }
 
 
