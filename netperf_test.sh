@@ -89,22 +89,25 @@ function load_test_from_peers()
 		let n=n+1
 		let port=10080+n
 		echo "Start netperf test at port $port from host $host"
-		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log" &
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log.$port" &
 	done
 
 	wait
 
 	# get remote logs
+	n=0
 	for host in $peer_host_list; do
 		let n=n+1
-		tmplog=netperf.tmplog.$n
-		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log; rm -f ~/temp.log" &> $tmplog
+		let port=10080+n
+		tmplog=./netperf.tmplog.$port
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log.$port; rm -f ~/temp.log.$port" &> $tmplog
 	done
 
 	# get results
 	debuglog=~/debuginfo.log
 	sdatalog=~/sourcedata.log
 
+	for tmplog in $(ls ./netperf.tmplog.*); do
 		sed -n '7p' $tmplog >> $sdatalog	# Get the 2nd line of UDP_STREAM report (remote:test-machine)
 		cat $tmplog >> $debuglog
 		rm -f $tmplog
