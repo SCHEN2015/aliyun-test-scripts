@@ -20,7 +20,7 @@ function stop_server_on_peers()
 	n=0
 	for host in $peer_host_list; do
 		echo "Stop netserver on peer $host."
-		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9"
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9 &>/dev/null"
 	done
 }
 
@@ -36,7 +36,7 @@ function load_test_to_peers()
 	for host in $peer_host_list; do
 		let n=n+1
 		let port=10080+n
-		tmplog=netperf.tmplog.$n
+		tmplog=./netperf.tmplog.$n
 		echo "Start netperf test at port $port to host $host"
 		netperf -H $host -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> $tmplog &
 	done
@@ -44,8 +44,11 @@ function load_test_to_peers()
 	wait
 
 	# get results
-	debuglog=~/debuginfo.log
-	sdatalog=~/sourcedata.log
+	debuglog=./debuginfo.log
+	sdatalog=./sourcedata.log
+
+	rm -f $debuglog &>/dev/null
+	rm -f $sdatalog &>/dev/null
 
 	for tmplog in $(ls ./netperf.tmplog.*); do
 		sed -n '6p' $tmplog >> $sdatalog	# Get the 1st line of UDP_STREAM report (local:test-machine)
@@ -72,7 +75,7 @@ function start_server_on_local()
 function stop_server_on_local()
 {
 	echo "Stop netserver on localhost."
-	pidof netserver | xargs kill -9
+	pidof netserver | xargs kill -9 &>/dev/null
 }
 
 function load_test_from_peers()
@@ -104,9 +107,12 @@ function load_test_from_peers()
 	done
 
 	# get results
-	debuglog=~/debuginfo.log
-	sdatalog=~/sourcedata.log
+	debuglog=./debuginfo.log
+	sdatalog=./sourcedata.log
 
+	rm -f $debuglog &>/dev/null
+	rm -f $sdatalog &>/dev/null
+	
 	for tmplog in $(ls ./netperf.tmplog.*); do
 		sed -n '7p' $tmplog >> $sdatalog	# Get the 2nd line of UDP_STREAM report (remote:test-machine)
 		cat $tmplog >> $debuglog
@@ -128,7 +134,7 @@ logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
 
 # basic information
 ./show_info_aliyun.sh >> $logfile
-echo -e "\n\n" >> $logfile
+echo -e "\n==========\\n" >> $logfile
 
 # Send test
 echo -e "\nStart netserver..."
@@ -163,18 +169,18 @@ start_server_on_local
 
 echo -e "\nStart netperf test..."
 load_test_from_peers 1400
-echo -e "Receive test:\n" >> $logfile
+echo -e "\nReceive test:\n" >> $logfile
 cat $debuglog >> $logfile
-echo -e "Source data:\n" >> $logfile
+echo -e "\nSource data:\n" >> $logfile
 cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 BWrx=$bw
 
 echo -e "\nStart netperf test..."
 load_test_from_peers 1
-echo -e "Receive test:\n" >> $logfile
+echo -e "\nReceive test:\n" >> $logfile
 cat $debuglog >> $logfile
-echo -e "Source data:\n" >> $logfile
+echo -e "\nSource data:\n" >> $logfile
 cat $sdatalog >> $logfile
 rm -f $debuglog $sdatalog
 PPSrx=$pps
@@ -184,7 +190,7 @@ stop_server_on_local
 
 # Write down summary
 echo -e "\nTest Summary: \n----------\n" >> $logfile
-printf "** %-20s %-10s %-10s %-10s %-10s\n" VMSize "BWtx(Gb/s)" PPStx "BWrx(Gb/s)" PPSrx >> $logfile
+printf "** %-20s %-10s %-10s %-10s %-10s\n" VMSize "BWtx(Gb/s)" "PPStx(10k)" "BWrx(Gb/s)" "PPSrx(10k)" >> $logfile
 printf "** %-20s %-10s %-10s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
 
 tail -n 4 $logfile
