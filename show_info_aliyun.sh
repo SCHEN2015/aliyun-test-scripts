@@ -27,6 +27,9 @@ show "" uname -a
 show "" cat /proc/cmdline
 show "" systemd-analyze
 
+show "" free -m
+show "" lscpu
+
 show "" lsblk -p
 show "" ip addr
 show "Metadata" ./metadata.sh
