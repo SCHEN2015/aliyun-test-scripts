@@ -112,7 +112,7 @@ function delete_instance()
 {
 	[ -z "$1" ] && return 1
 
-	if [[ "$1" = i* ]]; then
+	if [[ "$1" = i-* ]]; then
 		instance_id=$1
 	else
 		instance_name=$1
@@ -153,15 +153,21 @@ function list_private_ips()
 	echo -e "List of private_ips for train machine:\n\"$private_ips\""
 }
 
-#create_cluster
-#create_train_machines ecs.sn2ne.xlarge
-#create_test_machines ecs.sn2ne.14xlarge
 
-show_instance_info cheshi-netpt-test-machine
-#show_instance_info cheshi-netpt-train-machine-1
-#show_instance_info cheshi-netpt-train-machine-2
 
-list_private_ips
+function main()
+{
+	#create_cluster
+	#create_train_machines ecs.sn2ne.xlarge
+	#create_test_machines ecs.sn2ne.14xlarge
 
-exit 0
+	show_instance_info cheshi-netpt-test-machine
+	#show_instance_info cheshi-netpt-train-machine-1
+	#show_instance_info cheshi-netpt-train-machine-2
 
+	list_private_ips
+
+	exit 0
+}
+
+#main
