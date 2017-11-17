@@ -1,0 +1,4 @@
+[ "$1" = "-t" ] && echo "Instance-Type(Hostname) $(hostname)" && exit 0
+
+full_aliyun_metadata.sh
+
