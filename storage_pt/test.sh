@@ -37,7 +37,7 @@ run_cmd 'lsblk -d'
 run_cmd 'lsblk -t'
 run_cmd 'sudo blockdev --report'
 
-mode=aliyun-hdd
+mode=aliyun
 
 # blind test for all parameters
 if [ "$mode" = "blind_test" ]; then
@@ -108,21 +108,19 @@ elif [ "$mode" = "aliyun" ]; then
 
 	cd ~/workspace/bin
 
-	# EBS Bandwidth Test
-	fio2.sh $logfile $disktype aliyun_ssd_randread_bw.fio
-	fio2.sh $logfile $disktype aliyun_ssd_randread_iops.fio
-	fio2.sh $logfile $disktype aliyun_ssd_randwrite_bw.fio
-	fio2.sh $logfile $disktype aliyun_ssd_randwrite_iops.fio
+	if [ "$disktype" = "aliyun-efficiency" ] || [ "$disktype" = "aliyun-ssd" ]; then
+		fio2.sh $logfile $disktype aliyun_ssd_randread_bw.fio
+		fio2.sh $logfile $disktype aliyun_ssd_randread_iops.fio
+		fio2.sh $logfile $disktype aliyun_ssd_randwrite_bw.fio
+		fio2.sh $logfile $disktype aliyun_ssd_randwrite_iops.fio
+	fi
 
-elif [ "$mode" = "aliyun-hdd" ]; then
-
-	cd ~/workspace/bin
-
-	# EBS Bandwidth Test
-	fio2.sh $logfile $disktype aliyun_hdd_read_bw.fio
-	fio2.sh $logfile $disktype aliyun_hdd_read_iops.fio
-	fio2.sh $logfile $disktype aliyun_hdd_write_bw.fio
-	fio2.sh $logfile $disktype aliyun_hdd_write_iops.fio
+	if [ "$disktype" = "aliyun-hdd" ]; then
+		fio2.sh $logfile $disktype aliyun_hdd_read_bw.fio
+		fio2.sh $logfile $disktype aliyun_hdd_read_iops.fio
+		fio2.sh $logfile $disktype aliyun_hdd_write_bw.fio
+		fio2.sh $logfile $disktype aliyun_hdd_write_iops.fio
+	fi
 
 fi
 

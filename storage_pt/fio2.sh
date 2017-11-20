@@ -44,7 +44,7 @@ if [[ "$filename" =~ "/dev/" ]] && [ -z "$(lsblk -pd | grep $filename)" ]; then
 fi
 
 # Set Command
-cmd="sudo fio $script"
+cmd="fio $script"
 
 # Run test
 echo -e "\nTest Run: \n----------\n" >> $tlog

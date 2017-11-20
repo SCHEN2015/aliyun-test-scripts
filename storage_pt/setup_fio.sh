@@ -15,8 +15,11 @@ if [ "$(os_type.sh)" = "redhat" ]; then
 	sudo yum install -y wget libaio-devel
 
 	# setup fio
-	wget http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/f/fio-2.2.8-2.el7.x86_64.rpm
-	sudo yum localinstall -y ./fio*.rpm
+	wget http://brick.kernel.dk/snaps/fio-2.2.9.tar.gz
+	tar xvf fio-2.2.9.tar.gz
+	cd fio-2.2.9
+	./configure && make && sudo make install
+	cd -
 else
 	sudo apt install -y git gcc libaio-devel
 
