@@ -84,7 +84,7 @@ function load_test_from_peers()
 	# Outputs: $debuglog; $sdatalog; $bw : bandwidth in Mb/s; $pps : package# per second
 	msize=${1:-1400}
 	duration=10
-	localip=$(ifconfig eth0 | grep inet | awk '{print $2}')
+	localip=$(ifconfig eth0 | grep -w inet | awk '{print $2}')
 
 	# trigger load test
 	n=0
