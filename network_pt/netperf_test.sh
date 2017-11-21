@@ -188,10 +188,13 @@ PPSrx=$pps
 echo -e "\nStop netserver..."
 stop_server_on_local
 
+# Get NIC queue number
+nicqn=$(ethtool -l eth0 | grep "Combined:" | tail -n 1 | awk '{print $2}')
+
 # Write down summary
 echo -e "\nTest Summary: \n----------\n" >> $logfile
-printf "** %-20s %-10s %-10s %-10s %-10s\n" VMSize "BWtx(Gb/s)" "PPStx(10k)" "BWrx(Gb/s)" "PPSrx(10k)" >> $logfile
-printf "** %-20s %-10s %-10s %-10s %-10s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx >> $logfile
+printf "** %-20s %-10s %-10s %-10s %-10s %-6s\n" VMSize "BWtx(Gb/s)" "PPStx(10k)" "BWrx(Gb/s)" "PPSrx(10k)" "NICqn">> $logfile
+printf "** %-20s %-10s %-10s %-10s %-10s %-6s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx $nicqn >> $logfile
 
 tail -n 4 $logfile
 
