@@ -43,8 +43,21 @@ function create_instance()
 
 	echo -e "\nCreate Instance: $@"
 
+	region="us-west-1"
+	sgid="sg-rj9f46qhpa7q02u5jl2p"
+	zoneid="us-west-1a"
+	vswid="vsw-rj9vsve1fki07cy99plex"	# us-west-1a
+
+	#zoneid="us-west-1b"
+	#vswid="vsw-rj9mxj81k24a3erwqibza"	# us-west-1b
+
+	#imageid="rhel_6_9_64_20G_alibaba_20171117.vhd"	# us-west-1
+	imageid="rhel_7_4_64_20G_alibase_201701102.vhd"	# us-west-1
+	#imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"	# us-west-1
+	#imageid="alinux_7_01_64_40G_base_20170310.vhd"	# us-west-1
+
 	# create instance
-	x=$(aliyuncli ecs CreateInstance --InstanceType $instance_type --region us-west-1 --ImageId rhel_7_4_64_20G_alibase_201701102.vhd --InternetChargeType PayByBandwidth --SecurityGroupId sg-rj9f46qhpa7q02u5jl2p --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId vsw-rj9mxj81k24a3erwqibza --InstanceName $instance_name --HostName $host_name)
+	x=$(aliyuncli ecs CreateInstance --InstanceType $instance_type --region $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name --ZoneId $zoneid)
 	if [ $? -eq 0 ]; then
 		instance_id=$(echo $x | jq -r .InstanceId)
 		echo "Instance created, resource id = $instance_id)"
