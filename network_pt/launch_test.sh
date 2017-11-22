@@ -49,17 +49,20 @@ function create_instance()
 	#imageid="rhel_7_4_64_20G_alibase_201701102.vhd"	# rhel7.4-1102
 	#imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"		# rhel7.4-1117
 	#imageid="alinux_7_01_64_40G_base_20170310.vhd"		# alinux7.01
-	#zoneid="us-west-1a"
 	#vswid="vsw-rj9vsve1fki07cy99plex"	# us-west-1a
 	#vswid="vsw-rj9mxj81k24a3erwqibza"	# us-west-1b
 
-	region="cn-beijing"
-	sgid="sg-2zegq49eb2h96hflufnr"
-	imageid="m-2ze3kh9x3c6cxyqop18l"	# rhel7.4
-	#zoneid="cn-beijing-c"
+	#region="cn-beijing"
+	#sgid="sg-2zegq49eb2h96hflufnr"
+	#imageid="m-2ze3kh9x3c6cxyqop18l"	# rhel7.4
 	#vswid="vsw-2zegaxvc42lxgix28cmat"	# cn-beijing-c
-	vswid="vsw-2ze52osdol5jxuo96pv9f"	# cn-beijing-e
+	#vswid="vsw-2ze52osdol5jxuo96pv9f"	# cn-beijing-e
 
+	region="cn-qingdao"
+	sgid="sg-m5ej0zywmf2jtdlbw3bb"
+	#imageid="m-m5ebpt5n7u6mwj45e13i"		# rhel7.4
+	imageid="alinux_7_01_64_40G_base_20170310.vhd"	# alinux7.01
+	vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
 
 	# create instance
 	echo "aliyuncli ecs CreateInstance --InstanceType $instance_type --RegionID $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name"
