@@ -63,7 +63,7 @@ function create_instance()
 
 	# create instance
 	echo "aliyuncli ecs CreateInstance --InstanceType $instance_type --RegionID $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name"
-	x=$(aliyuncli ecs CreateInstance --InstanceType $instance_type --RegionID $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name) # --ZoneId $zoneid
+	x=$(aliyuncli ecs CreateInstance --InstanceType $instance_type --RegionID $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name) # --ZoneId $zoneid)
 	if [ $? -eq 0 ]; then
 		instance_id=$(echo $x | jq -r .InstanceId)
 		echo "Instance created, resource id = $instance_id"
@@ -121,7 +121,7 @@ function create_train_machines()
 {
 	instance_type=${1:-"ecs.sn2ne.2xlarge"}
 
-	for i in $(seq 8); do
+	for i in {1..24}; do
 		create_instance $instance_type cheshi-netpt-train-machine-$i cheshi-netpt-peer-$i
 	done
 }
@@ -163,7 +163,7 @@ function delete_instance()
 function list_private_ips()
 {
 	private_ips=""
-	for i in $(seq 8); do
+	for i in {1..24}; do
 		show_instance_info cheshi-netpt-train-machine-$i	# &>/dev/null
 		[ -z "$private_ip" ] && continue
 		[ -z "$private_ips" ] && private_ips=$private_ip || private_ips="$private_ips $private_ip"
