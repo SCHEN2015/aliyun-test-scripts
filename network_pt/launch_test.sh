@@ -58,11 +58,18 @@ function create_instance()
 	#vswid="vsw-2zegaxvc42lxgix28cmat"	# cn-beijing-c
 	#vswid="vsw-2ze52osdol5jxuo96pv9f"	# cn-beijing-e
 
-	region="cn-qingdao"
-	sgid="sg-m5ej0zywmf2jtdlbw3bb"
+	#region="cn-qingdao"
+	#sgid="sg-m5ej0zywmf2jtdlbw3bb"
 	#imageid="m-m5ebpt5n7u6mwj45e13i"		# rhel7.4
-	imageid="alinux_7_01_64_40G_base_20170310.vhd"	# alinux7.01
-	vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
+	#imageid="alinux_7_01_64_40G_base_20170310.vhd"	# alinux7.01
+	#vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
+
+	region="cn-hangzhou"
+	sgid="sg-bp11wy2vjnk28zxk8j2r"
+	imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"	# rhel7.4
+	vswid="vsw-bp19x809038ogmhja9m9u"		# cn-hangzhou-b
+	vswid=""		# cn-hangzhou-f
+
 
 	# create instance
 	echo "aliyuncli ecs CreateInstance --InstanceType $instance_type --RegionID $region --ImageId $imageid --InternetChargeType PayByBandwidth --SecurityGroupId $sgid --IoOptimized optimized --InternetMaxBandwidthOut 5 --SystemDiskCategory cloud_efficiency --KeyPairName cheshi --VSwitchId $vswid --InstanceName $instance_name --HostName $host_name"
