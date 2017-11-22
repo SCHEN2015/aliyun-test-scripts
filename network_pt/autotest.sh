@@ -32,13 +32,13 @@ else
     exit 1
 fi
 
-#echo "Waiting 1 min..."
-#sleep 1m
+echo "Waiting 2 min..."
+sleep 2m
 
 # Prepare test machine
 ssh-keygen -q -R $testip
 ssh -o StrictHostKeyChecking=no root@$testip "hostname"
-scp ~/.ssh/id_rsa root@$testip:~/cheshi_aliyun.pem
+scp -o StrictHostKeyChecking=no ~/.ssh/id_rsa root@$testip:~/cheshi_aliyun.pem
 if [ $? -ne 0 ]; then
     echo "This IP may be blocked by GFW."
     delete_instance $tm_instance_name
@@ -53,6 +53,7 @@ ssh root@$testip "~/setup_environment.sh 127.0.0.1 \"$peerips\""
 ssh root@$testip "~/netperf_test.sh \"$peerips\""
 ssh root@$testip "~/netperf_test.sh \"$peerips\""
 ssh root@$testip "~/netperf_test.sh \"$peerips\""
+#ssh root@$testip "~/netperf_test.sh \"$peerips $peerips\""
 
 # Get log
 scp root@$testip:~/netperf_test_*.log .
