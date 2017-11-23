@@ -64,11 +64,15 @@ function create_instance()
 	#imageid="alinux_7_01_64_40G_base_20170310.vhd"	# alinux7.01
 	#vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
 
-	region="cn-hangzhou"
-	sgid="sg-bp11wy2vjnk28zxk8j2r"
-	imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"	# rhel7.4
-	vswid="vsw-bp19x809038ogmhja9m9u"		# cn-hangzhou-b
-	vswid=""		# cn-hangzhou-f
+	#region="cn-hangzhou"
+	#sgid="sg-bp11wy2vjnk28zxk8j2r"
+	#imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"	# rhel7.4
+	#vswid="vsw-bp19x809038ogmhja9m9u"		# cn-hangzhou-b
+
+	region="cn-shanghai"
+	sgid="sg-uf63wzrvhq9vua9adwmf"
+	imageid="m-uf69era53oab649ylilk"	# rhel7.4
+	vswid="vsw-uf6mpsc0jzclp5bup00wl"	# cn-shanghai-d
 
 
 	# create instance
