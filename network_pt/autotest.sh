@@ -32,8 +32,8 @@ else
     exit 1
 fi
 
-echo "Waiting 2 min..."
-sleep 2m
+echo "Waiting 1 min..."
+sleep 1m
 
 # Prepare test machine
 ssh-keygen -q -R $testip
