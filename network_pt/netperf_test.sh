@@ -8,6 +8,7 @@ function start_server_on_peers()
 {
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		let port=10080+n
 		echo "Start netserver on peer $host, listen at $port."
@@ -19,6 +20,7 @@ function stop_server_on_peers()
 {
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		echo "Stop netserver on peer $host."
 		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9 &>/dev/null"
@@ -34,6 +36,7 @@ function load_test_to_peers()
 	# trigger load test
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		let port=10080+n
 		tmplog=./netperf.tmplog.$n
@@ -65,6 +68,7 @@ function start_server_on_local()
 {
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		let port=10080+n
 		echo "Start netserver on localhost, listen at $port."
@@ -90,6 +94,7 @@ function load_test_from_peers()
 	# trigger load test
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		let port=10080+n
 		echo "Start netperf test at port $port from host $host"
@@ -101,6 +106,7 @@ function load_test_from_peers()
 	# get remote logs
 	n=0
 	for host in $peer_host_list; do
+		[ $n -eq ${maxlink:=-1} ] && break
 		let n=n+1
 		let port=10080+n
 		tmplog=./netperf.tmplog.$port
@@ -134,6 +140,10 @@ pem=~/cheshi_aliyun.pem
 peer_host_list=$1
 vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned the instance_type into hostname.
 logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
+
+nicqn=$(ethtool -l eth0 | grep "Combined:" | tail -n 1 | awk '{print $2}')
+let maxlink=$nicqn*2	# comment this line to disable this feature
+
 duration=30
 
 # basic information
@@ -191,9 +201,6 @@ PPSrx=$pps
 
 echo -e "\nStop netserver..."
 stop_server_on_local
-
-# Get NIC queue number
-nicqn=$(ethtool -l eth0 | grep "Combined:" | tail -n 1 | awk '{print $2}')
 
 # Get other information
 link=$n
