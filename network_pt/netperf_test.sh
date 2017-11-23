@@ -19,6 +19,7 @@ function stop_server_on_peers()
 {
 	n=0
 	for host in $peer_host_list; do
+		let n=n+1
 		echo "Stop netserver on peer $host."
 		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "pidof netserver | xargs kill -9 &>/dev/null"
 	done
@@ -103,8 +104,10 @@ function load_test_from_peers()
 		let n=n+1
 		let port=10080+n
 		tmplog=./netperf.tmplog.$port
-		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log.$port; rm -f ~/temp.log.$port" &> $tmplog
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "cat ~/temp.log.$port; rm -f ~/temp.log.$port" &> $tmplog &
 	done
+
+	wait
 
 	# get results
 	debuglog=./debuginfo.log
