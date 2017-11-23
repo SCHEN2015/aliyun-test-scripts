@@ -10,9 +10,19 @@ type netperf && echo "Already installed." && exit 0
 #cd netperf-netperf-2.5.0
 #./configure && make && make install && cd ..
 
+cat /etc/redhat-release | grep "release 7" &>/dev/null
+if [ $? -eq 0 ]; then
+	# on RHEL7
+	curl -O ftp://rpmfind.net/linux/mageia/distrib/3/x86_64/media/core/release/netperf-2.5.0-2.mga3.x86_64.rpm
+fi
 
-curl -O ftp://rpmfind.net/linux/mageia/distrib/3/x86_64/media/core/release/netperf-2.5.0-2.mga3.x86_64.rpm
-yum localinstall netperf-2.5.0-2.mga3.x86_64.rpm -y
+cat /etc/redhat-release | grep "release 6" &>/dev/null
+if [ $? -eq 0 ]; then
+	# on RHEL6
+	curl -O http://rpmfind.net/linux/mageia/distrib/2/x86_64/media/core/release/netperf-2.5.0-1.mga2.x86_64.rpm
+fi
+
+yum localinstall netperf-*.rpm -y
 
 netperf -h
 netserver -h 

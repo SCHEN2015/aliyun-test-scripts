@@ -29,7 +29,6 @@ function load_test_to_peers()
 	# Inputs : $1 = message size;
 	# Outputs: $debuglog; $sdatalog; $bw : bandwidth in Mb/s; $pps : package# per second
 	msize=${1:-1400}
-	duration=10
 
 	# trigger load test
 	n=0
@@ -38,7 +37,7 @@ function load_test_to_peers()
 		let port=10080+n
 		tmplog=./netperf.tmplog.$n
 		echo "Start netperf test at port $port to host $host"
-		netperf -H $host -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> $tmplog &
+		netperf -H $host -p $port -t UDP_STREAM -l ${duration:=10} -f m -- -m $msize &> $tmplog &
 	done
 
 	wait
@@ -83,8 +82,9 @@ function load_test_from_peers()
 	# Inputs : $1 = message size;
 	# Outputs: $debuglog; $sdatalog; $bw : bandwidth in Mb/s; $pps : package# per second
 	msize=${1:-1400}
-	duration=10
+
 	localip=$(ifconfig eth0 | grep -w inet | awk '{print $2}')
+	[[ "$localip" = addr* ]] && localip=$(echo $localip | cut -f2 -d:)	# bugfix for RHEL6
 
 	# trigger load test
 	n=0
@@ -92,7 +92,7 @@ function load_test_from_peers()
 		let n=n+1
 		let port=10080+n
 		echo "Start netperf test at port $port from host $host"
-		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l $duration -f m -- -m $msize &> ~/temp.log.$port" &
+		ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "netperf -H $localip -p $port -t UDP_STREAM -l ${duration:=10} -f m -- -m $msize &> ~/temp.log.$port" &
 	done
 
 	wait
@@ -131,6 +131,7 @@ pem=~/cheshi_aliyun.pem
 peer_host_list=$1
 vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned the instance_type into hostname.
 logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
+duration=30
 
 # basic information
 ./show_info_aliyun.sh >> $logfile
@@ -191,10 +192,13 @@ stop_server_on_local
 # Get NIC queue number
 nicqn=$(ethtool -l eth0 | grep "Combined:" | tail -n 1 | awk '{print $2}')
 
+# Get other information
+link=$n
+
 # Write down summary
 echo -e "\nTest Summary: \n----------\n" >> $logfile
-printf "** %-20s %-10s %-10s %-10s %-10s %-6s\n" VMSize "BWtx(Gb/s)" "PPStx(10k)" "BWrx(Gb/s)" "PPSrx(10k)" "NICqn">> $logfile
-printf "** %-20s %-10s %-10s %-10s %-10s %-6s\n" $vmsize $BWtx $PPStx $BWrx $PPSrx $nicqn >> $logfile
+printf "** %-20s %-5s %-8s %-10s %-10s %-10s %-10s %-6s\n" VMSize Link Duration "BWtx(Gb/s)" "PPStx(10k)" "BWrx(Gb/s)" "PPSrx(10k)" "NICqn">> $logfile
+printf "** %-20s %-5s %-8s %-10s %-10s %-10s %-10s %-6s\n" $vmsize $link $duration $BWtx $PPStx $BWrx $PPSrx $nicqn >> $logfile
 
 tail -n 4 $logfile
 

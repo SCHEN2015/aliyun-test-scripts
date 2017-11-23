@@ -9,7 +9,7 @@ function upload()
 	host=$1
 	echo "Upload scripts to host $host"
 	scp -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem \
-		install_netperf.sh install_iperf3.sh enable_rps.sh disable_rps.sh check_environment.sh root@$host:~ &>/dev/null &
+		install_netperf.sh install_iperf3.sh enable_rps.sh disable_rps.sh check_environment.sh enable_all_nic_queues.sh root@$host:~ &>/dev/null &
 }
 
 function setup()
@@ -20,6 +20,7 @@ function setup()
 	#ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "~/install_iperf3.sh &>/dev/null" &
 	ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "~/enable_rps.sh &>/dev/null" &
 	#ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "~/disable_rps.sh &>/dev/null" &
+	ssh -o UserKnownHostsFile=~/.my_known_hosts -o StrictHostKeyChecking=no -i $pem root@$host "~/enable_all_nic_queues.sh &>/dev/null" &
 }
 
 function reboot()
