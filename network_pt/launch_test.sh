@@ -52,11 +52,12 @@ function create_instance()
 	#vswid="vsw-rj9vsve1fki07cy99plex"	# us-west-1a
 	#vswid="vsw-rj9mxj81k24a3erwqibza"	# us-west-1b
 
-	#region="cn-beijing"
-	#sgid="sg-2zegq49eb2h96hflufnr"
+	region="cn-beijing"
+	sgid="sg-2zegq49eb2h96hflufnr"
 	#imageid="m-2ze3kh9x3c6cxyqop18l"	# rhel7.4
-	#vswid="vsw-2zegaxvc42lxgix28cmat"	# cn-beijing-c
-	#vswid="vsw-2ze52osdol5jxuo96pv9f"	# cn-beijing-e
+	imageid="m-2zec75kyx5ua0w6vh5h4"	# rhel6.9
+	vswid="vsw-2zegaxvc42lxgix28cmat"	# cn-beijing-c
+	vswid="vsw-2ze52osdol5jxuo96pv9f"	# cn-beijing-e
 
 	#region="cn-qingdao"
 	#sgid="sg-m5ej0zywmf2jtdlbw3bb"
@@ -69,10 +70,10 @@ function create_instance()
 	#imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"	# rhel7.4
 	#vswid="vsw-bp19x809038ogmhja9m9u"		# cn-hangzhou-b
 
-	region="cn-shanghai"
-	sgid="sg-uf63wzrvhq9vua9adwmf"
-	imageid="m-uf69era53oab649ylilk"	# rhel7.4
-	vswid="vsw-uf6mpsc0jzclp5bup00wl"	# cn-shanghai-d
+	#region="cn-shanghai"
+	#sgid="sg-uf63wzrvhq9vua9adwmf"
+	#imageid="m-uf69era53oab649ylilk"	# rhel7.4
+	#vswid="vsw-uf6mpsc0jzclp5bup00wl"	# cn-shanghai-d
 
 
 	# create instance
@@ -192,7 +193,7 @@ function main()
 {
 	#create_cluster
 	#create_train_machines ecs.sn2ne.xlarge
-	#create_test_machines ecs.sn2ne.14xlarge
+	#create_test_machines ecs.scch5.16xlarge
 
 	show_instance_info cheshi-netpt-test-machine
 	#show_instance_info cheshi-netpt-train-machine-1
@@ -200,7 +201,9 @@ function main()
 
 	list_private_ips
 
+	#delete_instance i-2ze8gl7tjhwew1d1gz1o
+
 	exit 0
 }
 
-#main
+main
