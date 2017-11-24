@@ -142,7 +142,7 @@ vmsize="$(hostname)"	# Can't found instance_type in metadata, so I provisioned t
 logfile=./netperf_test_${vmsize}_$(date -u +%Y%m%d%H%M%S).log
 
 nicqn=$(ethtool -l eth0 | grep "Combined:" | tail -n 1 | awk '{print $2}')
-let maxlink=$nicqn*2	# comment this line to disable this feature
+let maxlink=$nicqn*4	# comment this line to disable this feature
 
 duration=30
 
