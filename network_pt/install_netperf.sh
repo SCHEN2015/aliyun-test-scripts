@@ -22,7 +22,7 @@ if [ $? -eq 0 ]; then
 	curl -O http://rpmfind.net/linux/mageia/distrib/2/x86_64/media/core/release/netperf-2.5.0-1.mga2.x86_64.rpm
 fi
 
-yum localinstall netperf-*.rpm -y
+rpm -ivh netperf-*.rpm
 
 netperf -h
 netserver -h 
