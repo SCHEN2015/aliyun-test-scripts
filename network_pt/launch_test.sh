@@ -43,14 +43,15 @@ function create_instance()
 
 	echo -e "\nCreate Instance: $@"
 
-	#region="us-west-1"
-	#sgid="sg-rj9f46qhpa7q02u5jl2p"
+	region="us-west-1"
+	sgid="sg-rj9f46qhpa7q02u5jl2p"
 	#imageid="rhel_7_4_64_20G_alibase_201701102.vhd"	# rhel7.4-1102
 	#imageid="rhel_7_4_64_20G_alibaba_20171117.vhd"		# rhel7.4-1117
+	imageid="rhel_7_4_64_20G_alibaba_20171128.vhd"		# rhel7.4-1128
 	#imageid="rhel_6_9_64_20G_alibaba_20171117.vhd"		# rhel6.9-1117
 	#imageid="alinux_7_01_64_40G_base_20170310.vhd"		# alinux17.1
 	#imageid="aliyun1501_64_40G_cloudinit_20160730.raw"	# alinux15.1
-	##vswid="vsw-rj9vsve1fki07cy99plex"			# us-west-1a
+	vswid="vsw-rj9vsve1fki07cy99plex"			# us-west-1a
 	#vswid="vsw-rj9mxj81k24a3erwqibza"			# us-west-1b
 
 	#region="cn-beijing"
@@ -62,13 +63,13 @@ function create_instance()
 	##vswid="vsw-2zegaxvc42lxgix28cmat"			# cn-beijing-c
 	#vswid="vsw-2ze52osdol5jxuo96pv9f"			# cn-beijing-e
 
-	region="cn-qingdao"
-	sgid="sg-m5ej0zywmf2jtdlbw3bb"
+	#region="cn-qingdao"
+	#sgid="sg-m5ej0zywmf2jtdlbw3bb"
 	#imageid="m-m5ebpt5n7u6mwj45e13i"		# rhel7.4
-	imageid="rhel_7_4_64_20G_alibaba_20171122.vhd"	# rhel7.4-1122
+	#imageid="rhel_7_4_64_20G_alibaba_20171122.vhd"	# rhel7.4-1122
 	#imageid="rhel_6_9_64_20G_alibaba_20171122.vhd"	# rhel6.9-1122
 	#imageid="alinux_7_01_64_40G_base_20170310.vhd"	# alinux7.01
-	vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
+	#vswid="vsw-m5edmrxkpghe3xh5w8rvm"		# cn-qingdao-c
 
 	#region="cn-hangzhou"
 	#sgid="sg-bp11wy2vjnk28zxk8j2r"
